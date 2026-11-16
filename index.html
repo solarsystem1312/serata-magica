@@ -173,9 +173,9 @@ html.blu .nav button[aria-current="page"]{background:rgba(212,167,60,.16);color:
 <div id="loader" role="status" aria-live="polite">
   <div class="emb" aria-hidden="true">
     <svg class="rays" viewBox="0 0 100 100"><g stroke="#c9a24a" stroke-width="1.2" stroke-linecap="round" opacity=".7"><line x1="50" y1="6" x2="50" y2="15" transform="rotate(0 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(15 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(30 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(45 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(60 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(75 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(90 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(105 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(120 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(135 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(150 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(165 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(180 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(195 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(210 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(225 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(240 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(255 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(270 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(285 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(300 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(315 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(330 50 50)"/><line x1="50" y1="6" x2="50" y2="15" transform="rotate(345 50 50)"/></g><circle cx="50" cy="50" r="33" fill="none" stroke="#c9a24a" stroke-width=".8" opacity=".5"/></svg>
-    <svg viewBox="0 0 100 100"><path d="M50 24 L74 66 L26 66 Z" fill="none" stroke="#e0b44a" stroke-width="2.2" stroke-linejoin="round"/><g class="eye"><path d="M38 52 Q50 42 62 52 Q50 62 38 52 Z" fill="#f4efe6"/><circle cx="50" cy="52" r="4.2" fill="#1c2a44"/></g></svg>
+    <svg viewBox="0 0 100 100"><g class="eye"><path d="M26 50 Q50 30 74 50 Q50 70 26 50 Z" fill="#f4efe6" stroke="#e0b44a" stroke-width="2.2" stroke-linejoin="round"/><circle cx="50" cy="50" r="9" fill="#1c2a44"/><circle cx="52.6" cy="47.4" r="2.2" fill="#f4efe6"/></g></svg>
   </div>
-  <div class="ttl">Il tempio si sta preparando</div>
+  <div class="ttl">Il portale si sta aprendo</div>
   <div class="bar"><i id="loader-bar"></i></div>
 </div>
 
@@ -191,6 +191,7 @@ html.blu .nav button[aria-current="page"]{background:rgba(212,167,60,.16);color:
   <input id="in-pass" type="password" autocomplete="new-password" aria-label="Password">
   <button id="btn-submit" type="button">Entra nel tempio</button>
   <button id="btn-toggle" type="button">Cambia tra registrazione e accesso</button>
+  <button id="btn-accetto" type="button">Accetto le regole</button>
 </div>
 
 <div class="app">
@@ -439,8 +440,9 @@ function blueMats(){
     for (var i = 0; i < 160; i++) { x.fillStyle = 'rgba(255,246,221,' + (.2 + r() * .6) + ')'; var s = r() * 1.8 + .4; x.fillRect(r() * w, r() * h, s, s); }
   }, [2, 2]), roughness: .9 });
   var sky = tex(1024, 1024, function(x, w, h){
-    x.fillStyle = '#0b0d24'; x.fillRect(0, 0, w, h);
+    var gg = x.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * .75); gg.addColorStop(0, '#24235c'); gg.addColorStop(.6, '#19184a'); gg.addColorStop(1, '#121139'); x.fillStyle = gg; x.fillRect(0, 0, w, h);
     var r = rnd(47);
+    for (var c = 0; c < 7; c++) { var px = r() * w, py = r() * h, rad = w * (.12 + r() * .2), ng = x.createRadialGradient(px, py, 0, px, py, rad); ng.addColorStop(0, c % 2 ? 'rgba(84,80,170,.22)' : 'rgba(150,130,210,.14)'); ng.addColorStop(1, 'rgba(40,38,100,0)'); x.fillStyle = ng; x.fillRect(0, 0, w, h); }
     for (var i = 0; i < 900; i++) { x.fillStyle = 'rgba(255,246,221,' + (.3 + r() * .7) + ')'; var s = r() * 2.4 + .6; x.beginPath(); x.arc(r() * w, r() * h, s / 2, 0, 7); x.fill(); }
   });
   BLUE_M = {
@@ -448,8 +450,8 @@ function blueMats(){
     trim: M({ map: tex(512, 512, stone('#e6e1f0', 41, { veins: 'rgba(110,100,140,.25)' })), roughness: .5 }),
     floor: M({ map: tex(512, 512, stone('#22204c', 43, { veins: 'rgba(200,190,255,.12)' }), [2, 2.5]), roughness: .25, metalness: .1 }),
     hallFloor: M({ map: tex(512, 512, stone('#22204c', 43, { veins: 'rgba(200,190,255,.12)' }), [2.4, 2.4]), roughness: .25, metalness: .1 }),
-    ceil: M({ map: sky, emissiveMap: sky, emissive: 0xffffff, emissiveIntensity: .7, roughness: 1 }),
-    beams: M({ color: 0x14133a, roughness: .7 }),
+    ceil: M({ map: sky, emissiveMap: sky, emissive: 0xffffff, emissiveIntensity: .6, roughness: 1 }),
+    beams: M({ color: 0x0a0920, roughness: 1 }),
     velvet: M({ color: 0x1d1a5e, roughness: .92, side: THREE.DoubleSide })
   };
   return BLUE_M;
@@ -637,8 +639,9 @@ function buildOspiti(room){
   }, [2, 2]), roughness: .9 });
   var marble = M({ map: tex(512, 512, stone('#e6e1f0', 41, { veins: 'rgba(110,100,140,.25)' })), roughness: .5 });
   var sky = tex(1024, 1024, function(x, w, h){
-    x.fillStyle = '#0b0d24'; x.fillRect(0, 0, w, h);
+    var gg = x.createRadialGradient(w/2, h/2, 0, w/2, h/2, w * .75); gg.addColorStop(0, '#24235c'); gg.addColorStop(.6, '#19184a'); gg.addColorStop(1, '#121139'); x.fillStyle = gg; x.fillRect(0, 0, w, h);
     var r = rnd(47);
+    for (var c = 0; c < 7; c++) { var px = r() * w, py = r() * h, rad = w * (.12 + r() * .2), ng = x.createRadialGradient(px, py, 0, px, py, rad); ng.addColorStop(0, c % 2 ? 'rgba(84,80,170,.22)' : 'rgba(150,130,210,.14)'); ng.addColorStop(1, 'rgba(40,38,100,0)'); x.fillStyle = ng; x.fillRect(0, 0, w, h); }
     for (var i = 0; i < 900; i++) { x.fillStyle = 'rgba(255,246,221,' + (.3 + r() * .7) + ')'; var s = r() * 2.4 + .6; x.beginPath(); x.arc(r() * w, r() * h, s / 2, 0, 7); x.fill(); }
   });
   var s = shell(room, 3, {
@@ -898,11 +901,17 @@ var carPage = 0, guestPage = 0, pageBtn = null, guestPageBtn = null;
 
 function drawStele(x, w, h, s){
   marbleFace(63)(x, w, h);
-  T(x, partyDateText(), w/2, h*.22, s*.18, { serif: true, weight: 700 });
-  T(x, 'ore ' + PARTY.time, w/2, h*.41, s*.16, { serif: true, weight: 700, color: '#8e2b1f' });
-  x.fillStyle = '#c9a24a'; x.fillRect(w*.3, h*.54, w*.4, Math.max(3, s*.008));
-  T(x, PARTY.place, w/2, h*.68, s*(PARTY.place.length > 32 ? .1 : .125), { weight: 500 });
-  T(x, countdownText(), w/2, h*.84, s*.095, { weight: 400, color: '#5c4632' });
+  var NAVY = '#1f1c52', RED = '#8e2b1f', GOLDT = '#8a6a22', mw = w * .84;
+  fitT(x, String(PARTY.name || '').toUpperCase(), w/2, h*.115, s*.25, mw, { serif: true, weight: 700, color: NAVY, spacing: 4 });
+  x.fillStyle = '#c9a24a'; x.fillRect(w*.32, h*.19, w*.36, Math.max(3, s*.008));
+  fitT(x, partyDateText() + '  ·  ore ' + PARTY.time, w/2, h*.28, s*.15, mw, { serif: true, weight: 700, color: RED });
+  fitT(x, PARTY.place, w/2, h*.385, s*.11, mw, { weight: 500, color: '#2a1c14' });
+  x.fillStyle = 'rgba(176,138,58,.6)'; x.fillRect(w*.2, h*.46, w*.6, Math.max(2, s*.005));
+  fitT(x, INFO.music.toUpperCase(), w/2, h*.535, s*.115, mw, { weight: 600, color: NAVY, spacing: 6 });
+  T(x, 'LINEUP', w/2, h*.615, s*.065, { weight: 600, color: GOLDT, spacing: 8 });
+  fitT(x, INFO.lineup.join('  ·  '), w/2, h*.69, s*.13, mw, { serif: true, weight: 700, color: NAVY });
+  fitT(x, (INFO.drink + ' · ' + INFO.drinkSub).toUpperCase(), w/2, h*.79, s*.09, mw, { weight: 600, color: GOLDT, spacing: 4 });
+  T(x, countdownText(), w/2, h*.885, s*.07, { weight: 400, color: '#6a5a46' });
 }
 var RULES = [
   'Meno auto possibile: organizzatevi con i passaggi e riempite i posti.',
@@ -917,7 +926,7 @@ var RULES = [
 var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 var steleG = null, rulesMat = null, festaBtns = [], rules = { open: false, anim: null };
 var RULES_H = 5.0;
-var STELE_BASE = { y: 2.25, z: -9.65 }, STELE_OPEN = { y: 3.85, z: -9.15, sy: RULES_H / 1.35 };
+var STELE_BASE = { y: 2.62, z: -9.65 }, STELE_OPEN = { y: 3.85, z: -9.15, sy: RULES_H / 2.1 };
 
 function wrapLines(x, text, maxW){
   var words = text.split(' '), lines = [], cur = '';
@@ -954,7 +963,7 @@ function contentFesta(room){
   var marble = M({ map: tex(512, 512, stone('#ece6da', 61, { veins: 'rgba(120,110,95,.22)' })), roughness: .45 });
   plinth(room, marble, 0, -9.7, 2.3, 1.55);
   steleG = new THREE.Group(); steleG.position.set(0, STELE_BASE.y, STELE_BASE.z); room.add(steleG);
-  steleSlab = slab(steleG, 2.6, 1.35, .2, faceTex(2.6, 1.35, drawStele), marble, 0, 0, 0, .14);
+  steleSlab = slab(steleG, 2.6, 2.1, .2, faceTex(2.6, 2.1, drawStele), marble, 0, 0, 0, .14);
   rulesMat = M({ map: faceTex(2.6, RULES_H, drawRules), roughness: .55 });
   var mats = steleSlab.material.slice(); mats[5] = rulesMat; steleSlab.material = mats;
   festaBtns.push(button3d(room, 0, 1.3, .4, 'Apri in Maps', 'primary', -.42, 1.32, -9.22, .3, ACTIONS.maps));
@@ -1223,7 +1232,7 @@ function refreshWorld(){
   if (atriumFrieze && changed('frieze', PARTY.name)) { var ft = String(PARTY.name || '').toUpperCase(), fm = atriumFrieze.material[4]; fm.map.dispose(); fm.map = tex(1536, 288, inscription(ft, ft.length > 14 ? 112 : 150, true)); fm.needsUpdate = true; }
   if (frontCanvas && changed('cardname', PARTY.name) && (phase === 'intro' || phase === 'key' || phase === 'checking')) drawFront();
   TITLES.festa = PARTY.name;
-  if (steleSlab && changed('stele', [PARTY, countdownText()])) { var m = steleSlab.material[4]; m.map.dispose(); m.map = faceTex(2.6, 1.55, drawStele); m.needsUpdate = true; }
+  if (steleSlab && changed('stele', [PARTY, countdownText()])) { var m = steleSlab.material[4]; m.map.dispose(); m.map = faceTex(2.6, 2.1, drawStele); m.needsUpdate = true; }
   if (quotaSlab && changed('quota', [PARTY, USER.nick])) { var q = quotaSlab.material[4]; q.map.dispose(); q.map = faceTex(2.6, 1.6, drawQuotaFace); q.needsUpdate = true; }
   if (sealMat && changed('seal', !!(me() && me().paid))) { sealMat.map.dispose(); sealMat.map = tex(256, 256, drawSeal); sealMat.needsUpdate = true; }
   refreshBoard(); refreshGuests();
@@ -1492,17 +1501,18 @@ function setupPointer(){
 }
 
 /* ---------- Banco, biglietto, registrazione ---------- */
-var KEY = 'guardieinfami9';
+var KEY = 'abracadabra1312';
 var phase = 'intro';
 var DESK_Y = 1.02, CARD_W = .8, CARD_L = 1.24, CARD_T = .016;
 var CW = 880, CH = 1360;
 var cardGroup, frontCanvas, backCanvas, frontTex, backTex;
 var form = { mode: 'register', key: '', nome: '', cognome: '', nick: '', pass: '', photo: null, focus: null, error: '', keyError: '', pressed: null };
-var caretOn = true, shakeT0 = -1, flipT0 = -1;
+var caretOn = true, shakeT0 = -1, flipT0 = -1, flip = null, cardStage = 'key', formOnFront = false;
 var quotaSlab = null, medalMats = [];
 
 var REG = {
   front: { key: [110, 800, 660, 100], enter: [230, 1000, 420, 104] },
+  info: { enter: [210, 1080, 460, 104] },
   register: { photo: [345, 205, 190, 190], nome: [70, 480, 360, 84], cognome: [450, 480, 360, 84], nick: [70, 630, 740, 84], pass: [70, 780, 740, 84], submit: [110, 935, 660, 104], toggle: [170, 1080, 540, 72] },
   host: { photo: [345, 420, 190, 190], submit: [110, 760, 660, 104] },
   login: { nick: [70, 430, 740, 84], pass: [70, 580, 740, 84], submit: [110, 735, 660, 104], toggle: [170, 880, 540, 72] }
@@ -1519,8 +1529,8 @@ function drawEye(x, cx, cy, s, ink, white){
   x.fillStyle = white; x.beginPath(); x.arc(cx + s * .1, cy - s * .1, s * .08, 0, 7); x.fill();
 }
 
-function drawFront(){
-  var x = frontCanvas.getContext('2d'), w = CW, h = CH, cx = w / 2, GOLD = '#d1b674', SOFT = 'rgba(209,182,116,.55)';
+function cardBg(x, w, h){
+  var cx = w / 2, GOLD = '#d1b674', SOFT = 'rgba(209,182,116,.55)';
   var g = x.createRadialGradient(cx, h * .3, 30, cx, h * .5, h * .85);
   g.addColorStop(0, '#1d2058'); g.addColorStop(.55, '#11133d'); g.addColorStop(1, '#07081f');
   x.fillStyle = g; x.fillRect(0, 0, w, h);
@@ -1533,6 +1543,10 @@ function drawFront(){
     x.beginPath(); x.moveTo(c[0], c[1] + c[3] * 120); x.lineTo(c[0] + c[2] * 120, c[1]); x.stroke();
     x.beginPath(); x.moveTo(c[0], c[1] + c[3] * 140); x.lineTo(c[0] + c[2] * 140, c[1]); x.globalAlpha = .5; x.stroke(); x.globalAlpha = 1;
   });
+}
+function drawFront(){
+  var x = frontCanvas.getContext('2d'), w = CW, h = CH, cx = w / 2, GOLD = '#d1b674', SOFT = 'rgba(209,182,116,.55)';
+  cardBg(x, w, h);
   var by = 352;
   x.strokeStyle = GOLD; x.lineWidth = 2.2;
   x.beginPath(); x.moveTo(cx - 220, by); x.lineTo(cx + 220, by); x.stroke();
@@ -1547,10 +1561,10 @@ function drawFront(){
   x.font = '600 ' + nfs + 'px ' + SERIF; var nw = x.measureText(name).width;
   if (nw > w * .8) nfs = nfs * (w * .8) / nw;
   T(x, name, cx, 478, nfs, { serif: true, weight: 600, color: '#efe3c6', spacing: 2 });
-  T(x, 'TORNATA RISERVATA', cx, 560, 24, { weight: 400, color: '#b9aa86', spacing: 12 });
+  T(x, 'PORTALE DI ACCESSO', cx, 560, 24, { weight: 400, color: '#b9aa86', spacing: 12 });
   x.strokeStyle = GOLD; x.lineWidth = 1.4; x.beginPath(); x.moveTo(cx - 54, 640); x.lineTo(cx + 54, 640); x.stroke();
   x.fillStyle = GOLD; x.beginPath(); x.arc(cx, 640, 4.5, 0, 7); x.fill();
-  T(x, 'CHIAVE DI ACCESSO', cx, 752, 22, { weight: 400, color: '#cdb985', spacing: 11 });
+  T(x, 'CHIAVE SEGRETA', cx, 752, 22, { weight: 400, color: '#cdb985', spacing: 11 });
   var f = REG.front.key, foc = form.focus === 'key';
   x.strokeStyle = form.keyError ? '#ff9a9a' : (foc ? '#f0dca8' : GOLD); x.lineWidth = foc ? 3 : 1.8;
   x.beginPath(); x.moveTo(f[0] + 20, f[1] + f[3] - 8); x.lineTo(f[0] + f[2] - 20, f[1] + f[3] - 8); x.stroke();
@@ -1571,6 +1585,44 @@ function drawFront(){
   T(x, 'FIRENZE  ·  MMXXVI', cx, 1250, 19, { weight: 400, color: '#7f7a9c', spacing: 12 });
   frontTex.needsUpdate = true;
 }
+var INFO = { music: 'Musica elettronica', lineup: ['Thomas Visyum', 'Fil', 'Lesciarr'], drink: 'All you can drink', drinkSub: 'self service', vibe: 'Presa bene' };
+function fitT(x, s, px, py, size, maxW, o){
+  x.font = (o.weight || 500) + ' ' + size + 'px ' + (o.serif ? SERIF : SANS);
+  if ('letterSpacing' in x) x.letterSpacing = (o.spacing || 0) + 'px';
+  var tw = x.measureText(s).width; if ('letterSpacing' in x) x.letterSpacing = '0px';
+  T(x, s, px, py, tw > maxW ? size * maxW / tw : size, o);
+}
+function drawInfo(){
+  var x = backCanvas.getContext('2d'), w = CW, h = CH, cx = w / 2, GOLD = '#d1b674', SOFT = 'rgba(209,182,116,.55)';
+  cardBg(x, w, h);
+  T(x, 'IL PORTALE SI È APERTO', cx, 150, 22, { weight: 400, color: '#b9aa86', spacing: 11 });
+  fitT(x, String(PARTY.name || ''), cx, 245, 96, w * .8, { serif: true, weight: 600, color: '#efe3c6', spacing: 2 });
+  x.strokeStyle = GOLD; x.lineWidth = 1.4; x.beginPath(); x.moveTo(cx - 54, 322); x.lineTo(cx + 54, 322); x.stroke();
+  x.fillStyle = GOLD; x.beginPath(); x.arc(cx, 322, 4.5, 0, 7); x.fill();
+  function row(label, value, y, size){
+    T(x, label, cx, y, 20, { weight: 400, color: '#cdb985', spacing: 10 });
+    x.font = '600 ' + size + 'px ' + SERIF;
+    var lines = wrapLines(x, String(value || ''), w * .78).slice(0, 2), lh = size * 1.12;
+    lines.forEach(function(l, k){ fitT(x, l, cx, y + 52 + k * lh, size, w * .8, { serif: true, weight: 600, color: '#f3ead2' }); });
+    return lines.length;
+  }
+  row('QUANDO', partyDateText() + (PARTY.time ? '  ·  ore ' + PARTY.time : ''), 400, 46);
+  var n = row('DOVE', PARTY.place, 530, 44);
+  row('QUOTA', (Number(PARTY.fee) || 0) + ' €', n > 1 ? 705 : 670, 52);
+  var fy = n > 1 ? 840 : 815, items = [INFO.music, INFO.drink + ' · ' + INFO.drinkSub, INFO.vibe];
+  x.strokeStyle = SOFT; x.lineWidth = 1; x.beginPath(); x.moveTo(cx - 230, fy - 44); x.lineTo(cx + 230, fy - 44); x.stroke();
+  items.forEach(function(it, k){
+    var y = fy + k * 62;
+    fitT(x, it.toUpperCase(), cx, y, 27, w * .78, { weight: 400, color: '#efe3c6', spacing: 7 });
+  });
+  var b = REG.info.enter, pr = form.pressed === 'enter';
+  if (pr) { x.fillStyle = 'rgba(209,182,116,.18)'; x.fillRect(b[0], b[1], b[2], b[3]); }
+  x.strokeStyle = GOLD; x.lineWidth = 2.2; x.strokeRect(b[0], b[1], b[2], b[3]);
+  x.lineWidth = 1; x.strokeStyle = SOFT; x.strokeRect(b[0] + 8, b[1] + 8, b[2] - 16, b[3] - 16);
+  T(x, 'PARTECIPO', cx, b[1] + b[3] / 2 + 2, 30, { weight: 400, color: '#efe3c6', spacing: 14 });
+  T(x, 'FIRENZE  ·  MMXXVI', cx, 1250, 19, { weight: 400, color: '#7f7a9c', spacing: 12 });
+  backTex.needsUpdate = true;
+}
 
 function drawField(x, r, label, value, ph, id, secret){
   var foc = form.focus === id;
@@ -1585,7 +1637,7 @@ function drawField(x, r, label, value, ph, id, secret){
   x.restore();
 }
 function drawBack(){
-  var x = backCanvas.getContext('2d'), w = CW, h = CH, cx = w / 2;
+  var x = (formOnFront ? frontCanvas : backCanvas).getContext('2d'), w = CW, h = CH, cx = w / 2;
   stone('#f4ecda', 444, { veins: 'rgba(150,120,80,.14)' })(x, w, h);
   x.strokeStyle = '#b08a3a'; x.lineWidth = 6; x.strokeRect(28, 28, w - 56, h - 56);
   x.lineWidth = 2; x.strokeRect(46, 46, w - 92, h - 92);
@@ -1639,9 +1691,9 @@ function drawBack(){
   var tw = x.measureText(form.mode === 'register' ? 'Hai già un account? Accedi' : 'Non hai un account? Registrati').width;
   x.fillRect(cx - tw / 2, tg[1] + tg[3] / 2 + 22, tw, 3);
   }
-  backTex.needsUpdate = true;
+  (formOnFront ? frontTex : backTex).needsUpdate = true;
 }
-function redrawCard(){ if (phase === 'key' || phase === 'intro') drawFront(); else drawBack(); }
+function redrawCard(){ if (cardStage === 'key') drawFront(); else if (cardStage === 'info') drawInfo(); else drawBack(); }
 
 function symbolTex(kind){
   return tex(256, 256, function(x, w, h){
@@ -1730,7 +1782,7 @@ function cardPose(){
 }
 function cardPx2World(px, py){ cardBase.updateMatrixWorld(); return cardBase.localToWorld(new THREE.Vector3((px / CW - .5) * CARD_W, .03 + CARD_T, (py / CH - .5) * CARD_L)); }
 function placeOverlay(){
-  var regions = phase === 'key' ? REG.front : (phase === 'form' ? REG[form.mode] : null);
+  var regions = phase === 'key' ? REG.front : (phase === 'info' ? REG.info : (phase === 'form' ? REG[form.mode] : null));
   Object.keys(OVERLAY).forEach(function(k){
     var el = ovl[k]; if (!el) return;
     var r = regions && regions[k];
@@ -1766,7 +1818,7 @@ function setupCardUI(){
     };
     rd.readAsDataURL(f);
   });
-  [['enter', tryKey], ['submit', submitForm], ['toggle', toggleMode]].forEach(function(p){
+  [['enter', function(){ if (phase === 'info') partecipa(); else tryKey(); }], ['submit', submitForm], ['toggle', toggleMode]].forEach(function(p){
     var el = ovl[p[0]];
     el.addEventListener('pointerdown', function(){ form.pressed = p[0]; redrawCard(); });
     el.addEventListener('pointerup', function(){ form.pressed = null; redrawCard(); });
@@ -1775,10 +1827,17 @@ function setupCardUI(){
   });
   setInterval(function(){ if (form.focus) { caretOn = !caretOn; redrawCard(); } }, 530);
 }
-function beginFlip(){
+function beginFlip(to, next, msg){
   phase = 'flipping'; placeOverlay();
-  if (reduce) { cardGroup.rotation.z = Math.PI; phase = 'form'; placeOverlay(); announce(form.mode === 'host' ? 'Carica la tua foto profilo.' : 'Chiave corretta. Compila la registrazione.'); return; }
+  flip = { from: cardGroup.rotation.z, to: to, next: next, msg: msg };
+  if (reduce) { cardGroup.rotation.z = to; phase = next; placeOverlay(); announce(msg); return; }
   flipT0 = clock.getElapsedTime();
+}
+function partecipa(){
+  if (phase !== 'info') return;
+  form.pressed = null; drawInfo();
+  form.mode = 'register'; form.error = ''; formOnFront = true; cardStage = 'form'; drawBack();
+  beginFlip(Math.PI * 2, 'form', 'Compila la registrazione.');
 }
 async function tryKey(){
   if (phase !== 'key') return;
@@ -1791,9 +1850,12 @@ async function tryKey(){
     if (host) {
       USER = { id: host.id, nick: host.name, host: true, hostPass: k, photo: null };
       if (me()) { saveSession({ uid: host.id, hostPass: k }); if (!DEMO) await reload(); phase = 'key'; enterTemple(); return; }
-      form.mode = 'host';
-    } else form.mode = 'register';
-    drawBack(); beginFlip();
+      form.mode = 'host'; formOnFront = false; cardStage = 'form'; drawBack();
+      beginFlip(Math.PI, 'form', 'Carica la tua foto profilo.');
+    } else {
+      cardStage = 'info'; drawInfo();
+      beginFlip(Math.PI, 'info', 'Chiave corretta. Ecco le informazioni sulla festa: premi Partecipo per registrarti.');
+    }
   } else {
     form.keyError = form.key ? 'Chiave non valida, riprova' : 'Scrivi la chiave che ti hanno dato';
     drawFront(); announce(form.keyError);
@@ -1870,9 +1932,9 @@ function cardAnim(t){
   }
   if (flipT0 >= 0) {
     var f = Math.min(1, (t - flipT0) / 1.35), e = easeInOut(f);
-    cardGroup.rotation.z = Math.PI * e;
+    cardGroup.rotation.z = flip.from + (flip.to - flip.from) * e;
     cardGroup.position.y = .03 + CARD_T / 2 + Math.sin(Math.PI * e) * .3;
-    if (f >= 1) { flipT0 = -1; phase = 'form'; placeOverlay(); announce('Chiave corretta. Ora registrati sul retro del biglietto.'); }
+    if (f >= 1) { flipT0 = -1; phase = flip.next; placeOverlay(); announce(flip.msg); }
   }
 }
 
@@ -2145,8 +2207,8 @@ function partyLights(){
   function spot(x, y, z, r, k){ var m = new THREE.Mesh(new THREE.CircleGeometry(r, 32), new THREE.MeshBasicMaterial({ map: glowTex(), color: 0xffffff, transparent: true, opacity: .55, depthWrite: false, blending: THREE.AdditiveBlending })); m.rotation.x = Math.PI / 2; m.position.set(x, y, z); scene.add(m); spots.push({ m: m, k: k, x: x, z: z }); }
   [[0, 0], [2.6, 2.6], [-2.6, -2.6], [2.6, -2.6], [-2.6, 2.6]].forEach(function(q, k){ spot(q[0], 7.36, q[1], 2.4, k); });
   [-8, -11, -14].forEach(function(z, k){ spot(0, 7.33, z, 2.2, k + 2); });
-  var hallL = new THREE.PointLight(0x7a3cff, 1.7, 15); hallL.position.set(0, 6.4, 0); scene.add(hallL);
-  var festaL = new THREE.PointLight(0xd1284a, 1.6, 14); festaL.position.set(0, 6.6, -11); scene.add(festaL);
+  var hallL = new THREE.PointLight(0x7a3cff, 1.7, 15); hallL.position.set(0, 5.5, 0); scene.add(hallL);
+  var festaL = new THREE.PointLight(0xd1284a, 1.6, 14); festaL.position.set(0, 5.4, -11); scene.add(festaL);
   var c = new THREE.Color();
   function hue(t, off){ var f = ((t * .06 + off) % 1 + 1) % 1 * cols.length, i = Math.floor(f), w = f - i; return c.copy(cols[i]).lerp(cols[(i + 1) % cols.length], w * w * (3 - 2 * w)); }
   anim.push(function(t){
@@ -2392,7 +2454,7 @@ function setupLightsAndShadows(){
 var DOOR_LOOK = null, DOOR_STAND = null, passContent = [];
 function aheadOf(from, to, d){ return from.clone().add(to.clone().sub(from).normalize().multiplyScalar(d)); }
 function startIntro(){
-  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, stop: function(){ tween = null; } };
+  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; } };
   DOOR_LOOK = V(0, 2.25, DOOR_Z); DOOR_STAND = V(0, 2.5, 21.7);
   var P0 = V(4.6, 2.7, 40), L0 = V(0, 3.4, 14);
   camera.position.copy(P0); camera.lookAt(L0);
@@ -2416,7 +2478,109 @@ function startIntro(){
     }
   });
 }
+
+/* lastra di marmo con le regole, cala davanti alla porta */
+var ENTRY_RULES = ['Rispetto degli spazi', 'Chi rompe o danneggia, ripaga', 'Niente fumo dove è vietato', 'Rispetto degli orari di inizio e fine', 'Raccolta differenziata', 'Niente mozziconi per terra'];
+var RW = 1000, RH = 1420, RBTN = [290, 1196, 420, 112];
+var rslab = null;
+function drawEntryRules(x, w, h){
+  stone('#f1ede6', 811, { veins: 'rgba(110,104,128,.22)' })(x, w, h);
+  var r = rnd(812); x.lineCap = 'round';
+  for (var v = 0; v < 9; v++) { x.strokeStyle = 'rgba(96,92,118,' + (.05 + r() * .12) + ')'; x.lineWidth = .8 + r() * 2.2; x.beginPath(); var sx = r() * w; x.moveTo(sx, -10); x.bezierCurveTo(sx + (r() - .5) * 500, h * .35, sx + (r() - .5) * 600, h * .65, sx + (r() - .5) * 400, h + 10); x.stroke(); }
+  var GOLD = '#a8812f';
+  x.strokeStyle = GOLD; x.lineWidth = 7; x.strokeRect(30, 30, w - 60, h - 60);
+  x.lineWidth = 2; x.strokeRect(52, 52, w - 104, h - 104);
+  [[52, 52, 1, 1], [w - 52, 52, -1, 1], [52, h - 52, 1, -1], [w - 52, h - 52, -1, -1]].forEach(function(c){ x.beginPath(); x.moveTo(c[0], c[1] + c[3] * 90); x.lineTo(c[0] + c[2] * 90, c[1]); x.stroke(); });
+  function E(t, px, py, size, o){ var c = o.color; o.color = 'rgba(255,255,255,.75)'; T(x, t, px + 1.5, py + 2, size, o); o.color = c; T(x, t, px, py, size, o); }
+  E('LE REGOLE DI', w / 2, 150, 30, { weight: 400, color: '#6d5a2c', spacing: 12 });
+  var name = String(PARTY.name || '').toUpperCase(), ns = 86;
+  x.font = '700 ' + ns + 'px ' + SERIF; var nw = x.measureText(name).width; if (nw > w * .78) ns = ns * w * .78 / nw;
+  E(name, w / 2, 232, ns, { serif: true, weight: 700, color: '#26223f', spacing: 3 });
+  x.fillStyle = GOLD; x.fillRect(w / 2 - 70, 300, 140, 2); x.save(); x.translate(w / 2, 301); x.rotate(Math.PI / 4); x.fillRect(-6, -6, 12, 12); x.restore();
+  E('REGOLE DEL POSTO', w / 2, 362, 26, { weight: 400, color: '#7c6532', spacing: 10 });
+  var top = 420, step = 108, left = 230, maxW = w - left - 110;
+  ENTRY_RULES.forEach(function(t, i){
+    var cy = top + step * i + step / 2;
+    E(ROMAN[i], 150, cy + 2, 40, { serif: true, weight: 700, color: GOLD });
+    x.font = '400 40px ' + SANS; var lines = wrapLines(x, t, maxW), sz = lines.length > 1 ? 34 : 40;
+    if (lines.length > 1) { x.font = '400 34px ' + SANS; lines = wrapLines(x, t, maxW); }
+    var lh = sz * 1.2, y0 = cy - (lines.length - 1) * lh / 2;
+    lines.forEach(function(l, k){ E(l, left, y0 + k * lh, sz, { weight: 400, color: '#26223f', align: 'left' }); });
+    if (i < ENTRY_RULES.length - 1) { x.fillStyle = 'rgba(168,129,47,.35)'; x.fillRect(left, top + step * (i + 1), maxW, 1.5); }
+  });
+  E('Ti consigliamo di fare uno screenshot', w / 2, 1118, 27, { weight: 400, color: '#6d5a2c', spacing: 2 });
+  var b = RBTN;
+  x.fillStyle = '#16153c'; x.fillRect(b[0], b[1], b[2], b[3]);
+  x.strokeStyle = '#d1b674'; x.lineWidth = 2.4; x.strokeRect(b[0] + 7, b[1] + 7, b[2] - 14, b[3] - 14);
+  T(x, 'ACCETTO', w / 2, b[1] + b[3] / 2 + 2, 34, { weight: 400, color: '#efe3c6', spacing: 14 });
+}
+function buildRulesSlab(){
+  var cvs = document.createElement('canvas'); cvs.width = RW; cvs.height = RH; drawEntryRules(cvs.getContext('2d'), RW, RH);
+  var t = new THREE.CanvasTexture(cvs); t.encoding = THREE.sRGBEncoding; t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  var face = M({ map: t, roughness: .45, emissive: 0xffffff, emissiveMap: t, emissiveIntensity: .42 });
+  var side = M({ color: 0xe6e1d8, roughness: .5, emissive: 0x2a2830 });
+  var g = new THREE.Group(); g.visible = false; scene.add(g);
+  var inner = new THREE.Group(); g.add(inner);
+  var box = add(inner, new THREE.BoxGeometry(1, 1, 1), [side, side, side, side, face, side]);
+  var chainM = M({ color: 0xb08d45, metalness: .75, roughness: .35, emissive: 0x2a1f08 });
+  var LINK = .074, N = 70, geo = new THREE.TorusGeometry(.034, .009, 6, 14);
+  var chains = [0, 1].map(function(){ var m = new THREE.InstancedMesh(geo, chainM, N); inner.add(m); return m; });
+  rslab = { g: g, inner: inner, box: box, chains: chains, N: N, LINK: LINK, anim: null };
+  anim.push(function(){ rulesSlabStep(performance.now()); });
+}
+function layoutRulesSlab(){
+  var dir = DOOR_LOOK.clone().sub(DOOR_STAND).normalize(), D = 2.25;
+  var vf = THREE.MathUtils.degToRad(camera.fov) / 2, visH = 2 * D * Math.tan(vf), visW = visH * camera.aspect;
+  var sw = Math.min(visW * .9, visH * .84 * RW / RH), sh = sw * RH / RW;
+  var c = DOOR_STAND.clone().addScaledVector(dir, D);
+  rslab.center = c; rslab.drop = visH * .5 + sh * .5 + .4; rslab.sw = sw; rslab.sh = sh;
+  rslab.g.position.copy(c); rslab.g.lookAt(DOOR_STAND);
+  rslab.box.scale.set(sw, sh, .07);
+  var dummy = new THREE.Object3D();
+  rslab.chains.forEach(function(m, ci){
+    var x0 = (ci ? 1 : -1) * sw * .36;
+    for (var k = 0; k < rslab.N; k++) {
+      dummy.position.set(x0, sh / 2 + .03 + k * rslab.LINK, 0);
+      dummy.rotation.set(0, k % 2 ? Math.PI / 2 : 0, 0); dummy.scale.set(1, 1.3, 1);
+      dummy.updateMatrix(); m.setMatrixAt(k, dummy.matrix);
+    }
+    m.instanceMatrix.needsUpdate = true;
+  });
+}
+function slabPx2World(px, py){ rslab.inner.updateMatrixWorld(); return rslab.inner.localToWorld(new THREE.Vector3((px / RW - .5) * rslab.sw, (.5 - py / RH) * rslab.sh, .04)); }
+function placeAccept(show){
+  var el = document.getElementById('btn-accetto'); if (!el) return;
+  if (!show) { el.style.display = 'none'; return; }
+  var a = slabPx2World(RBTN[0], RBTN[1]).project(camera), b = slabPx2World(RBTN[0] + RBTN[2], RBTN[1] + RBTN[3]).project(camera);
+  var st = document.getElementById('stage'), W = st.clientWidth, H = st.clientHeight;
+  var x0 = (Math.min(a.x, b.x) + 1) / 2 * W, x1 = (Math.max(a.x, b.x) + 1) / 2 * W, y0 = (1 - Math.max(a.y, b.y)) / 2 * H, y1 = (1 - Math.min(a.y, b.y)) / 2 * H;
+  el.style.display = 'block'; el.style.left = x0 + 'px'; el.style.top = y0 + 'px'; el.style.width = (x1 - x0) + 'px'; el.style.height = (y1 - y0) + 'px';
+}
+function rulesSlabStep(now){
+  var a = rslab && rslab.anim; if (!a) return;
+  var k = Math.min(1, (now - a.start) / a.dur), e;
+  if (a.dir > 0) { e = 1 - Math.pow(1 - k, 3); rslab.inner.position.y = rslab.drop * (1 - e); rslab.inner.rotation.z = Math.sin(k * 9) * .035 * (1 - k); }
+  else { e = k * k * k; rslab.inner.position.y = rslab.drop * e * 1.15; rslab.inner.rotation.z = 0; }
+  if (k >= 1) { rslab.anim = null; if (a.done) a.done(); }
+}
+function showEntryRules(cb){
+  if (!rslab) buildRulesSlab();
+  else { var cv = rslab.box.material[4].map.image; drawEntryRules(cv.getContext('2d'), RW, RH); rslab.box.material[4].map.needsUpdate = true; }
+  phase = 'rules'; layoutRulesSlab(); rslab.g.visible = true; rslab.inner.position.y = rslab.drop;
+  announce('Le regole di ' + PARTY.name + ': ' + ENTRY_RULES.join('. ') + '. Premi Accetto per entrare.');
+  var el = document.getElementById('btn-accetto');
+  var go = function(e){ if (e) e.preventDefault(); el.removeEventListener('click', go); placeAccept(false);
+    rslab.anim = { start: performance.now(), dur: 1100, dir: -1, done: function(){ rslab.g.visible = false; phase = 'flying'; cb(); } }; };
+  rslab.anim = { start: performance.now(), dur: 1900, dir: 1, done: function(){ placeAccept(true); el.addEventListener('click', go); try { el.focus({ preventScroll: true }); } catch(_) {} } };
+  window.addEventListener('resize', function(){ if (phase === 'rules' && !rslab.anim) placeAccept(true); });
+}
+function afterDoor(delay){
+  phase = 'flying';
+  if (USER.host || reduce) { setTimeout(glideIn, delay); return; }
+  showEntryRules(function(){ glideIn(); });
+}
 function finishEntry(){
+  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; } };
   phase = 'rooms'; current = 0; setNav(0);
   if (USER.host) { var rb = document.querySelector('[data-go="regia"]'); rb.hidden = false; document.querySelector('.nav .col').classList.add('five'); }
   document.querySelector('.nav').classList.remove('off');
@@ -2436,13 +2600,13 @@ function enterTemple(atDoor){
   if (reduce) { door.t = 1; setDoor(1); aim(camPos(0), camYaw(0), PITCH); finishEntry(); return; }
   if (atDoor === true) {
     openDoor(3000);
-    setTimeout(glideIn, door.t > .6 ? 400 : 1500);
+    afterDoor(door.t > .6 ? 400 : 1500);
     return;
   }
   var cp = cardPose(), start = camera.position.clone();
   tween = { mode: 'look', pos: new THREE.CatmullRomCurve3([start, V(0, 3.7, 22.6), DOOR_STAND], false, 'centripetal'),
     look: new THREE.CatmullRomCurve3([cp.look, V(0, 1.9, 19.5), DOOR_LOOK], false, 'centripetal'), start: performance.now(), dur: 2600,
-    done: function(){ openDoor(3000); setTimeout(glideIn, 1500); } };
+    done: function(){ openDoor(3000); afterDoor(1500); } };
 }
 
 if (window.THREE) { THREE.DefaultLoadingManager.onProgress = function(u, a, b){ loaderProgress(.15 + .7 * a / Math.max(1, b)); };
