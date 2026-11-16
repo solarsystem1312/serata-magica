@@ -819,8 +819,8 @@ var HOSTS = {
 var SKEY = 'festaMagica.session.v2';
 var USER_COLS = 'id,ruolo,nome,cognome,nick,foto,pagato,viaggio,avviso,creato';
 var sb = null, DEMO = false, channel = null, PASSWORDS = {};
-var MAX = 30;
-var PARTY = { name: 'Sun System', date: '2026-11-21', time: '21:30', place: "Piazza dell'Isolotto, Firenze", maps: 'https://www.google.com/maps/search/?api=1&query=Piazza+dell%27Isolotto+Firenze', fee: 30, iban: 'IT60 X054 2811 1010 0000 0123 456', holder: 'Sun System' };
+var MAX = 45;
+var PARTY = { name: 'Sun System', date: '2026-12-12', time: '21:00', place: "Piazza dell'Isolotto, Firenze", maps: 'https://www.google.com/maps/search/?api=1&query=Piazza+dell%27Isolotto+Firenze', fee: 30, iban: 'IT60 X054 2811 1010 0000 0123 456', holder: 'Sun System' };
 var PEOPLE = [], CARS = [];
 var PALETTE = ['#8e2b1f', '#4a7398', '#c9a066', '#2c4f74', '#6a1e15', '#9a6e37', '#84a5bf', '#5c4632', '#6b4f7a'];
 function colorFor(id){ var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0; return PALETTE[h % PALETTE.length]; }
@@ -913,16 +913,48 @@ function drawStele(x, w, h, s){
   fitT(x, (INFO.drink + ' · ' + INFO.drinkSub).toUpperCase(), w/2, h*.79, s*.09, mw, { weight: 600, color: GOLDT, spacing: 4 });
   T(x, countdownText(), w/2, h*.885, s*.07, { weight: 400, color: '#6a5a46' });
 }
-var RULES = [
-  'Meno auto possibile: organizzatevi con i passaggi e riempite i posti.',
-  'Il link è solo per gli invitati: non condividetelo con nessun altro.',
-  'La quota si paga esclusivamente con bonifico.',
-  'Niente alcolici portati da fuori: dentro c’è l’open bar, già incluso nel prezzo.',
-  'Niente sudicio in giro: ogni cosa al suo posto.',
-  'Niente sigarette o mozziconi per terra.',
-  'Rispetto per il luogo e per le persone, sempre.',
-  'I fascisti non sono ammessi.'
-];
+var RULES = [];
+var PAY_BY = '6 dicembre';
+function ruleItems(){
+  var n = String(PARTY.name || 'la festa');
+  return [
+    { t: 'Il link è solo tuo', d: 'Non condividere link e chiave di accesso con nessun*: gli invitati li decidono gli organizzatori. La lista dei presenti è nel portale.' },
+    { t: 'È una festa privata', d: n + ' è un evento privato fra amic*, su invito e non a scopo di lucro. La registrazione serve solo a organizzarci.' },
+    { t: 'La quota va pagata in tempo', d: 'Versala ' + (PAY_BY ? 'entro il ' + PAY_BY : 'entro la scadenza indicata') + ': chi non ha pagato non potrà entrare.' },
+    { t: 'Chi rompe, ripaga', d: 'Ognun* risponde personalmente di ciò che rompe o danneggia e dovrà risarcirlo.' },
+    { t: 'Rispetta gli spazi', d: 'Siamo responsabili di un luogo da restituire in condizioni perfette: usa solo le aree a disposizione e tratta con cura arredi e attrezzature.' },
+    { t: 'Fuma solo dove è permesso', d: 'Niente sigarette dove è vietato; i mozziconi vanno nei posacenere, mai per terra.' },
+    { t: 'Fai la raccolta differenziata', d: 'È obbligatoria: ogni rifiuto nel contenitore giusto.' },
+    { t: 'Rispetta gli orari', d: 'Arriva e vai via negli orari indicati: l’uso del posto ha un inizio e una fine precisi.' },
+    { t: 'Rispetta tutt* i presenti', d: n + ' è uno spazio sicuro: chi si comporta in modo irrispettoso verrà allontanat*.' }
+  ];
+}
+function rulesText(){ return ruleItems().map(function(r){ return r.t + '. ' + r.d; }); }
+/* elenco numerato che si adatta allo spazio: titolo + spiegazione */
+function drawRuleList(x, x0, x1, top, bottom, o){
+  var items = ruleItems(), numX = x0 + o.num * .5, tx = x0 + o.num * 1.12, maxW = x1 - tx;
+  var ts = o.title, ds = o.desc, layout;
+  for (var tries = 0; tries < 30; tries++) {
+    var total = 0;
+    layout = items.map(function(it){
+      x.font = '400 ' + ds + 'px ' + SANS; var lines = wrapLines(x, it.d, maxW);
+      var hgt = ts * 1.25 + lines.length * ds * 1.32; total += hgt; return { it: it, lines: lines, h: hgt };
+    });
+    var gapMin = ts * .55;
+    if (total + gapMin * (items.length - 1) <= bottom - top) break;
+    ts *= .95; ds *= .95;
+  }
+  var gap = (bottom - top - total) / (items.length - 1 || 1), y = top;
+  layout.forEach(function(L, i){
+    o.text(ROMAN[i], numX, y + ts * .55, ts * (ROMAN[i].length > 3 ? .78 : ROMAN[i].length > 2 ? .9 : 1.05), { serif: true, weight: 700, color: o.gold });
+    o.text(L.it.t, tx, y + ts * .55, ts, { serif: true, weight: 700, color: o.ink, align: 'left' });
+    L.lines.forEach(function(l, k){ o.text(l, tx, y + ts * 1.25 + ds * .62 + k * ds * 1.32, ds, { weight: 400, color: o.ink2, align: 'left' }); });
+    y += L.h;
+    if (i < layout.length - 1) { x.fillStyle = o.rule; x.fillRect(tx, y + gap / 2 - 1, maxW, 1.5); }
+    y += gap;
+  });
+}
+
 var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 var steleG = null, rulesMat = null, festaBtns = [], rules = { open: false, anim: null };
 var RULES_H = 5.0;
@@ -938,22 +970,11 @@ function drawRules(x, w, h){
   stone('#f4efe6', 707, { veins: 'rgba(120,110,95,.18)' })(x, w, h);
   var b = 14; x.strokeStyle = '#b08a3a'; x.lineWidth = b; x.strokeRect(b, b, w - 2*b, h - 2*b);
   x.lineWidth = 4; x.strokeRect(40, 40, w - 80, h - 80);
-  T(x, 'LE REGOLE DEL TEMPIO', w/2, 140, 62, { serif: true, weight: 700, color: '#2a1c14', spacing: 4 });
-  x.fillStyle = '#c9a24a'; x.fillRect(w * .3, 192, w * .4, 5);
-  var top = 230, bottom = h - 230, gap = (bottom - top) / RULES.length;
-  var size = 50, left = 178, maxW = w - left - 74;
-  RULES.forEach(function(r, i){
-    var cy = top + gap * i + gap / 2;
-    if (i > 0) { var gy = top + gap * i; x.fillStyle = 'rgba(176,138,58,.55)'; x.fillRect(left, gy - 1.5, maxW, 3); x.fillStyle = '#c9a24a'; x.save(); x.translate(108, gy); x.rotate(Math.PI / 4); x.fillRect(-6, -6, 12, 12); x.restore(); }
-    x.fillStyle = '#8e2b1f'; x.beginPath(); x.arc(108, cy, 44, 0, 7); x.fill();
-    x.strokeStyle = '#e0b44a'; x.lineWidth = 4; x.beginPath(); x.arc(108, cy, 37, 0, 7); x.stroke();
-    T(x, ROMAN[i], 108, cy + 2, ROMAN[i].length > 2 ? 28 : 36, { serif: true, weight: 700, color: '#fdf6e0' });
-    x.font = '500 ' + size + 'px ' + SANS;
-    var lines = wrapLines(x, r, maxW), sz = size;
-    if (lines.length > 2) { sz = 44; x.font = '500 ' + sz + 'px ' + SANS; lines = wrapLines(x, r, maxW); }
-    var lh = sz * 1.22, y0 = cy - (lines.length - 1) * lh / 2;
-    lines.forEach(function(l, k){ T(x, l, left, y0 + k * lh, sz, { weight: 500, color: '#2a1c14', align: 'left' }); });
-  });
+  T(x, 'LE REGOLE DI', w/2, 100, 32, { weight: 400, color: '#7c6532', spacing: 12 });
+  fitT(x, String(PARTY.name || '').toUpperCase(), w/2, 162, 66, w * .8, { serif: true, weight: 700, color: '#1f1c52', spacing: 3 });
+  x.fillStyle = '#c9a24a'; x.fillRect(w * .32, 208, w * .36, 4);
+  drawRuleList(x, 56, w - 60, 250, h - 300, { num: 60, title: 58, desc: 46, gold: '#a8812f', ink: '#1f1c52', ink2: '#2a1c14', rule: 'rgba(176,138,58,.45)', text: function(t, px, py, sz, o){ T(x, t, px, py, sz, o); } });
+  T(x, 'Ti consigliamo di fare uno screenshot', w/2, h - 254, 32, { weight: 400, color: '#7c6532', spacing: 2 });
   var bw = 520, bh = 120, bx = (w - bw) / 2, by = h - 200;
   rr(x, bx, by, bw, bh, 60); x.fillStyle = '#8e2b1f'; x.fill();
   x.strokeStyle = '#e0b44a'; x.lineWidth = 4; rr(x, bx + 10, by + 10, bw - 20, bh - 20, 50); x.stroke();
@@ -997,9 +1018,9 @@ function openRules(open){
   if (open) festaBtns.forEach(function(b){ b.holder.visible = false; });
   var rp = rulesPose(), from = open ? 0 : 1, to = open ? 1 : 0;
   var done = function(){
-    rules.anim = null; rules.open = open; moving = false;
+    setStele(to); rules.anim = null; rules.open = open; moving = false;
     if (!open) festaBtns.forEach(function(b){ b.holder.visible = true; });
-    announce(open ? 'Le regole: ' + RULES.join(' ') : 'Regole chiuse');
+    announce(open ? 'Le regole: ' + rulesText().join(' ') : 'Regole chiuse');
   };
   if (reduce) { setStele(to); if (open) { camera.position.copy(rp.pos); camera.lookAt(rp.look); } else aim(camPos(0), camYaw(0), PITCH); done(); return; }
   rules.anim = { start: performance.now(), dur: 1600, from: from, to: to };
@@ -1164,8 +1185,8 @@ function drawOspitiTablet(x, w, h, s){
   marbleFace(101)(x, w, h);
   var n = PEOPLE.length;
   T(x, 'Ospiti', w*.1, h*.5, s*.13, { serif: true, weight: 700, align: 'left' });
-  x.fillStyle = '#d9cfbd'; x.fillRect(w*.42, h*.44, w*.3, h*.12);
-  x.fillStyle = '#8e2b1f'; x.fillRect(w*.42, h*.44, w*.3 * Math.min(1, n / MAX), h*.12);
+  x.fillStyle = '#d9cfbd'; x.fillRect(w*.38, h*.44, w*.26, h*.12);
+  x.fillStyle = '#8e2b1f'; x.fillRect(w*.38, h*.44, w*.26 * Math.min(1, n / MAX), h*.12);
   T(x, n + ' / ' + MAX, w*.9, h*.5, s*.12, { weight: 600, align: 'right' });
 }
 var imgCache = {}, photoT = null;
@@ -1190,18 +1211,25 @@ function medalDraw(p){
       x.fillStyle = 'rgba(20,10,5,.78)'; x.font = '700 120px ' + SERIF; x.textAlign = 'center'; x.textBaseline = 'middle';
       x.fillText((p.nick || '?')[0].toUpperCase(), w/2, h*.42);
     }
-    x.fillStyle = 'rgba(253,251,246,.92)'; x.fillRect(0, h*.68, w, h*.2);
-    T(x, p.nick, w/2, h*.78, p.nick.length > 8 ? 34 : (p.nick.length > 6 ? 40 : 46), { weight: 600, color: '#2a1c14' });
+    x.fillStyle = 'rgba(253,251,246,.92)'; x.fillRect(0, h*.64, w, h*.24);
+    fitT(x, p.nick, w/2, h*.76, 62, w * .8, { weight: 600, color: '#2a1c14' });
   };
 }
 function refreshGuests(){
   if (ospitiSlab && changed('tablet', PEOPLE.length)) { var m = ospitiSlab.material[4]; m.map.dispose(); m.map = faceTex(1.9, .46, drawOspitiTablet); m.needsUpdate = true; }
   var list = PEOPLE.slice().sort(function(a, b){ return (b.id === USER.id) - (a.id === USER.id) || (b.host - a.host); });
-  var pages = Math.max(1, Math.ceil(list.length / 8)); if (guestPage >= pages) guestPage = 0;
+  var PAGE = 24, pages = Math.max(1, Math.ceil(list.length / PAGE)); if (guestPage >= pages) guestPage = 0;
+  var m = Math.min(PAGE, list.length - guestPage * PAGE), best = null;
+  for (var c = 4; c <= 6; c++) { var rows = Math.max(1, Math.ceil(m / c)), cell = Math.min(2.7 / c, 1.72 / rows, .78); if (!best || cell > best.cell + 1e-6) best = { c: c, rows: rows, cell: cell }; }
+  if (m <= 4) best = { c: Math.max(1, m), rows: 1, cell: .78 };
+  var GR = Math.min(.28, best.cell * .44), top = 2.42, H = 1.72, rowsH = best.rows * best.cell, y0 = top - (H - rowsH) / 2 - best.cell / 2;
   discs.forEach(function(d, i){
-    var p = list[guestPage * 8 + i];
+    var p = i < m ? list[guestPage * PAGE + i] : null;
     d.group.visible = !!p;
     if (!p) return;
+    var row = Math.floor(i / best.c), inRow = Math.min(best.c, m - row * best.c), col = i - row * best.c;
+    d.x = (col - (inRow - 1) / 2) * best.cell; d.y0 = y0 - row * best.cell;
+    d.group.position.x = d.x; d.group.scale.setScalar(GR / .28);
     var ready = !!photoOf(p);
     if (!changed('disc' + i, [p.id, p.nick, p.color, (p.foto || '').length, ready, p.id === USER.id && !!USER.photo])) return;
     if (d.mat.map) d.mat.map.dispose();
@@ -1213,25 +1241,25 @@ function contentOspiti(room){
   var marble = M({ color: 0xe6e1f0, roughness: .5 });
   ospitiSlab = slab(room, 1.9, .46, .1, faceTex(1.9, .46, drawOspitiTablet), marble, 0, 2.78, -9.7, .1);
   var gold = M({ color: 0xd4a73c, metalness: .55, roughness: .35, emissive: 0x2a1e04 });
-  for (var i = 0; i < 8; i++) (function(i){
-    var col = i % 4, row = Math.floor(i / 4);
-    var x0 = -.99 + col * .66, y0 = 2.08 - row * .78;
+  for (var i = 0; i < 24; i++) (function(i){
+    var x0 = 0, y0 = 2;
     var disc = new THREE.Group(); disc.position.set(x0, y0, -9.6); room.add(disc);
     var fm = M({ roughness: .5 });
     add(disc, new THREE.CylinderGeometry(.28, .28, .05, 48), [gold, fm, gold], 0, 0, 0, Math.PI/2, Math.PI/2);
     add(disc, new THREE.TorusGeometry(.285, .025, 8, 48), gold);
-    discs.push({ group: disc, mat: fm });
+    var dd = { group: disc, mat: fm, y0: y0 }; discs.push(dd);
     var ph = i * .8;
-    anim.push(function(t){ disc.position.y = y0 + Math.sin(t * .8 + ph) * .04; disc.rotation.y = Math.sin(t * .5 + ph) * .18; });
+    anim.push(function(t){ if (!disc.visible) return; disc.position.y = dd.y0 + Math.sin(t * .8 + ph) * .04 * disc.scale.x; disc.rotation.y = Math.sin(t * .5 + ph) * .18; });
   })(i);
-  guestPageBtn = button3d(room, 3, .95, .38, 'Altri', 'secondary', .55, .78, -9.45, .25, function(){ guestPage++; refreshGuests(); });
-  button3d(room, 3, .95, .38, 'Esci', 'secondary', -.55, .78, -9.45, .25, function(){ saveSession(null); location.reload(); });
+  guestPageBtn = button3d(room, 3, .95, .38, 'Altri', 'secondary', .55, .48, -9.45, .25, function(){ guestPage++; refreshGuests(); });
+  button3d(room, 3, .95, .38, 'Esci', 'secondary', -.55, .48, -9.45, .25, function(){ saveSession(null); location.reload(); });
   refreshGuests();
 }
 function refreshWorld(){
   if (atriumFrieze && changed('frieze', PARTY.name)) { var ft = String(PARTY.name || '').toUpperCase(), fm = atriumFrieze.material[4]; fm.map.dispose(); fm.map = tex(1536, 288, inscription(ft, ft.length > 14 ? 112 : 150, true)); fm.needsUpdate = true; }
   if (frontCanvas && changed('cardname', PARTY.name) && (phase === 'intro' || phase === 'key' || phase === 'checking')) drawFront();
   TITLES.festa = PARTY.name;
+  if (rulesMat && changed('rulesface', PARTY.name)) { rulesMat.map.dispose(); rulesMat.map = faceTex(2.6, RULES_H, drawRules); rulesMat.needsUpdate = true; }
   if (steleSlab && changed('stele', [PARTY, countdownText()])) { var m = steleSlab.material[4]; m.map.dispose(); m.map = faceTex(2.6, 2.1, drawStele); m.needsUpdate = true; }
   if (quotaSlab && changed('quota', [PARTY, USER.nick])) { var q = quotaSlab.material[4]; q.map.dispose(); q.map = faceTex(2.6, 1.6, drawQuotaFace); q.needsUpdate = true; }
   if (sealMat && changed('seal', !!(me() && me().paid))) { sealMat.map.dispose(); sealMat.map = tex(256, 256, drawSeal); sealMat.needsUpdate = true; }
@@ -2454,7 +2482,7 @@ function setupLightsAndShadows(){
 var DOOR_LOOK = null, DOOR_STAND = null, passContent = [];
 function aheadOf(from, to, d){ return from.clone().add(to.clone().sub(from).normalize().multiplyScalar(d)); }
 function startIntro(){
-  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; } };
+  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; }, fake: function(n){ var nm = ['Orione','Vega','Sirio','Lyra','Atlas','Nova','Rigel','Altair','Mira','Deneb','Castore','Polluce','Ariel','Titania','Elara','Io','Callisto','Europa','Ganimede','Febe','Rea','Teti','Dione','Mimas','Encelado','Iperione','Giapeto','Pan','Atlante','Prometeo','Pandora','Epimeteo','Giano','Elena','Calipso','Telesto','Ymir','Paaliaq','Tarvos','Ijiraq','Kiviuq','Mundilfari','Albiorix','Skathi','Erriapus']; for (var i = PEOPLE.length; i < n; i++) PEOPLE.push(fromUser({ id: 'f' + i, ruolo: 'guest', nick: nm[i % nm.length], nome: 'x', pagato: false })); refreshGuests(); }, rules: function(){ openRules(true); }, slab: function(){ tween = null; DOOR_STAND = V(0, 2.5, 21.7); camera.position.copy(DOOR_STAND); camera.lookAt(DOOR_LOOK); door.t = 1; setDoor(1); showEntryRules(function(){}); }, state: function(){ return JSON.stringify({ open: rules.open, anim: !!rules.anim, ry: steleG.rotation.y, view: camera.view, phase: phase, moving: moving }); } };
   DOOR_LOOK = V(0, 2.25, DOOR_Z); DOOR_STAND = V(0, 2.5, 21.7);
   var P0 = V(4.6, 2.7, 40), L0 = V(0, 3.4, 14);
   camera.position.copy(P0); camera.lookAt(L0);
@@ -2480,8 +2508,7 @@ function startIntro(){
 }
 
 /* lastra di marmo con le regole, cala davanti alla porta */
-var ENTRY_RULES = ['Rispetto degli spazi', 'Chi rompe o danneggia, ripaga', 'Niente fumo dove è vietato', 'Rispetto degli orari di inizio e fine', 'Raccolta differenziata', 'Niente mozziconi per terra'];
-var RW = 1000, RH = 1420, RBTN = [290, 1196, 420, 112];
+var RW = 1000, RH = 1900, RBTN = [290, 1712, 420, 112];
 var rslab = null;
 function drawEntryRules(x, w, h){
   stone('#f1ede6', 811, { veins: 'rgba(110,104,128,.22)' })(x, w, h);
@@ -2492,23 +2519,13 @@ function drawEntryRules(x, w, h){
   x.lineWidth = 2; x.strokeRect(52, 52, w - 104, h - 104);
   [[52, 52, 1, 1], [w - 52, 52, -1, 1], [52, h - 52, 1, -1], [w - 52, h - 52, -1, -1]].forEach(function(c){ x.beginPath(); x.moveTo(c[0], c[1] + c[3] * 90); x.lineTo(c[0] + c[2] * 90, c[1]); x.stroke(); });
   function E(t, px, py, size, o){ var c = o.color; o.color = 'rgba(255,255,255,.75)'; T(x, t, px + 1.5, py + 2, size, o); o.color = c; T(x, t, px, py, size, o); }
-  E('LE REGOLE DI', w / 2, 150, 30, { weight: 400, color: '#6d5a2c', spacing: 12 });
-  var name = String(PARTY.name || '').toUpperCase(), ns = 86;
+  E('LE REGOLE DI', w / 2, 118, 30, { weight: 400, color: '#6d5a2c', spacing: 12 });
+  var name = String(PARTY.name || '').toUpperCase(), ns = 74;
   x.font = '700 ' + ns + 'px ' + SERIF; var nw = x.measureText(name).width; if (nw > w * .78) ns = ns * w * .78 / nw;
-  E(name, w / 2, 232, ns, { serif: true, weight: 700, color: '#26223f', spacing: 3 });
-  x.fillStyle = GOLD; x.fillRect(w / 2 - 70, 300, 140, 2); x.save(); x.translate(w / 2, 301); x.rotate(Math.PI / 4); x.fillRect(-6, -6, 12, 12); x.restore();
-  E('REGOLE DEL POSTO', w / 2, 362, 26, { weight: 400, color: '#7c6532', spacing: 10 });
-  var top = 420, step = 108, left = 230, maxW = w - left - 110;
-  ENTRY_RULES.forEach(function(t, i){
-    var cy = top + step * i + step / 2;
-    E(ROMAN[i], 150, cy + 2, 40, { serif: true, weight: 700, color: GOLD });
-    x.font = '400 40px ' + SANS; var lines = wrapLines(x, t, maxW), sz = lines.length > 1 ? 34 : 40;
-    if (lines.length > 1) { x.font = '400 34px ' + SANS; lines = wrapLines(x, t, maxW); }
-    var lh = sz * 1.2, y0 = cy - (lines.length - 1) * lh / 2;
-    lines.forEach(function(l, k){ E(l, left, y0 + k * lh, sz, { weight: 400, color: '#26223f', align: 'left' }); });
-    if (i < ENTRY_RULES.length - 1) { x.fillStyle = 'rgba(168,129,47,.35)'; x.fillRect(left, top + step * (i + 1), maxW, 1.5); }
-  });
-  E('Ti consigliamo di fare uno screenshot', w / 2, 1118, 27, { weight: 400, color: '#6d5a2c', spacing: 2 });
+  E(name, w / 2, 186, ns, { serif: true, weight: 700, color: '#26223f', spacing: 3 });
+  x.fillStyle = GOLD; x.fillRect(w / 2 - 70, 240, 140, 2); x.save(); x.translate(w / 2, 241); x.rotate(Math.PI / 4); x.fillRect(-6, -6, 12, 12); x.restore();
+  drawRuleList(x, 48, w - 56, 278, 1640, { num: 56, title: 52, desc: 42, gold: GOLD, ink: '#26223f', ink2: '#2f2b45', rule: 'rgba(168,129,47,.35)', text: function(t, px, py, sz, o){ E(t, px, py, sz, o); } });
+  E('Ti consigliamo di fare uno screenshot', w / 2, 1668, 30, { weight: 400, color: '#6d5a2c', spacing: 2 });
   var b = RBTN;
   x.fillStyle = '#16153c'; x.fillRect(b[0], b[1], b[2], b[3]);
   x.strokeStyle = '#d1b674'; x.lineWidth = 2.4; x.strokeRect(b[0] + 7, b[1] + 7, b[2] - 14, b[3] - 14);
@@ -2531,7 +2548,7 @@ function buildRulesSlab(){
 function layoutRulesSlab(){
   var dir = DOOR_LOOK.clone().sub(DOOR_STAND).normalize(), D = 2.25;
   var vf = THREE.MathUtils.degToRad(camera.fov) / 2, visH = 2 * D * Math.tan(vf), visW = visH * camera.aspect;
-  var sw = Math.min(visW * .9, visH * .84 * RW / RH), sh = sw * RH / RW;
+  var sw = Math.min(visW * .94, visH * .9 * RW / RH), sh = sw * RH / RW;
   var c = DOOR_STAND.clone().addScaledVector(dir, D);
   rslab.center = c; rslab.drop = visH * .5 + sh * .5 + .4; rslab.sw = sw; rslab.sh = sh;
   rslab.g.position.copy(c); rslab.g.lookAt(DOOR_STAND);
@@ -2567,7 +2584,7 @@ function showEntryRules(cb){
   if (!rslab) buildRulesSlab();
   else { var cv = rslab.box.material[4].map.image; drawEntryRules(cv.getContext('2d'), RW, RH); rslab.box.material[4].map.needsUpdate = true; }
   phase = 'rules'; layoutRulesSlab(); rslab.g.visible = true; rslab.inner.position.y = rslab.drop;
-  announce('Le regole di ' + PARTY.name + ': ' + ENTRY_RULES.join('. ') + '. Premi Accetto per entrare.');
+  announce('Le regole di ' + PARTY.name + ': ' + rulesText().join(' ') + ' Premi Accetto per entrare.');
   var el = document.getElementById('btn-accetto');
   var go = function(e){ if (e) e.preventDefault(); el.removeEventListener('click', go); placeAccept(false);
     rslab.anim = { start: performance.now(), dur: 1100, dir: -1, done: function(){ rslab.g.visible = false; phase = 'flying'; cb(); } }; };
@@ -2580,7 +2597,7 @@ function afterDoor(delay){
   showEntryRules(function(){ glideIn(); });
 }
 function finishEntry(){
-  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; } };
+  if (/[?&]dbg=1/.test(location.search)) window.__dbg = { cam: camera, scene: scene, stop: function(){ tween = null; }, fake: function(n){ var nm = ['Orione','Vega','Sirio','Lyra','Atlas','Nova','Rigel','Altair','Mira','Deneb','Castore','Polluce','Ariel','Titania','Elara','Io','Callisto','Europa','Ganimede','Febe','Rea','Teti','Dione','Mimas','Encelado','Iperione','Giapeto','Pan','Atlante','Prometeo','Pandora','Epimeteo','Giano','Elena','Calipso','Telesto','Ymir','Paaliaq','Tarvos','Ijiraq','Kiviuq','Mundilfari','Albiorix','Skathi','Erriapus']; for (var i = PEOPLE.length; i < n; i++) PEOPLE.push(fromUser({ id: 'f' + i, ruolo: 'guest', nick: nm[i % nm.length], nome: 'x', pagato: false })); refreshGuests(); }, rules: function(){ openRules(true); }, slab: function(){ tween = null; DOOR_STAND = V(0, 2.5, 21.7); camera.position.copy(DOOR_STAND); camera.lookAt(DOOR_LOOK); door.t = 1; setDoor(1); showEntryRules(function(){}); }, state: function(){ return JSON.stringify({ open: rules.open, anim: !!rules.anim, ry: steleG.rotation.y, view: camera.view, phase: phase, moving: moving }); } };
   phase = 'rooms'; current = 0; setNav(0);
   if (USER.host) { var rb = document.querySelector('[data-go="regia"]'); rb.hidden = false; document.querySelector('.nav .col').classList.add('five'); }
   document.querySelector('.nav').classList.remove('off');
