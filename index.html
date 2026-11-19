@@ -35,6 +35,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cardui{position:absolute;inset:0;pointer-events:none;z-index:5}
 #rulespanel{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,8,24,.5);animation:rpin .35s ease}
 #rulespanel[hidden]{display:none}
+#guestcard{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,8,24,.55);animation:rpin .3s ease}
+#guestcard[hidden]{display:none}
+.gc-card{width:min(340px,100%);text-align:center;background:linear-gradient(#f5f1ea,#e8e2d5);border:3px solid #a8812f;outline:1px solid rgba(168,129,47,.55);outline-offset:-9px;border-radius:3px;box-shadow:0 24px 70px rgba(0,0,0,.65);padding:30px 24px 24px;color:#1c2440}
+.gc-photo{width:168px;height:168px;margin:0 auto;border-radius:50%;overflow:hidden;border:4px solid #c9a24a;box-shadow:0 0 0 2px #1a2a5c;display:flex;align-items:center;justify-content:center;font:700 72px var(--f-display);color:#f4efe6;background:#1a2a5c}
+.gc-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.gc-tag{margin:14px 0 0;font:400 12px var(--f-body);letter-spacing:.32em;color:#8a6628}
+.gc-nick{margin:10px 0 0;font:700 30px/1.15 var(--f-display);letter-spacing:.04em;color:#1a2a5c;word-break:break-word}
+.gc-name{margin:6px 0 20px;font:400 17px var(--f-body);color:#2a3248;min-height:1em}
 @keyframes rpin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 .rp-card{width:min(560px,100%);max-height:min(88vh,860px);display:flex;flex-direction:column;background:linear-gradient(#f5f1ea,#e8e2d5);border:3px solid #a8812f;outline:1px solid rgba(168,129,47,.55);outline-offset:-9px;border-radius:3px;box-shadow:0 24px 70px rgba(0,0,0,.65);color:#1c2440}
 .rp-head{padding:24px 24px 12px;text-align:center;border-bottom:1px solid rgba(168,129,47,.4)}
@@ -212,6 +220,7 @@ html.blu .nav button[aria-current="page"]{background:rgba(212,167,60,.16);color:
   <button id="btn-toggle" type="button">Cambia tra registrazione e accesso</button>
   <button id="btn-accetto" type="button">Accetto le regole</button>
 </div>
+<div id="guestcard" hidden role="dialog" aria-modal="true" aria-label="Scheda ospite"><div class="gc-card"><div class="gc-photo"></div><p class="gc-tag" hidden>HOST</p><h2 class="gc-nick"></h2><p class="gc-name"></p><button id="gc-btn" type="button" class="rp-btn">Chiudi</button></div></div>
 <div id="rulespanel" hidden role="dialog" aria-modal="true" aria-labelledby="rp-title"><div class="rp-card"><div class="rp-head"><p class="rp-k">LE REGOLE DI</p><h2 id="rp-title"></h2></div><ol class="rp-list" tabindex="0"></ol><div class="rp-more" aria-hidden="true">scorri per leggere tutto ↓</div><div class="rp-foot"><p>Ti consigliamo di fare uno screenshot</p><button id="rp-btn" type="button" class="rp-btn">Accetto</button></div></div></div>
 
 <div class="app">
@@ -1265,7 +1274,7 @@ function refreshGuests(){
   var GR = Math.min(.28, best.cell * .44), top = 2.42, H = 1.72, rowsH = best.rows * best.cell, y0 = top - (H - rowsH) / 2 - best.cell / 2;
   discs.forEach(function(d, i){
     var p = i < m ? list[guestPage * PAGE + i] : null;
-    d.group.visible = !!p;
+    d.group.visible = !!p; d.person = p;
     if (!p) return;
     var row = Math.floor(i / best.c), inRow = Math.min(best.c, m - row * best.c), col = i - row * best.c;
     d.x = (col - (inRow - 1) / 2) * best.cell; d.y0 = y0 - row * best.cell;
@@ -1285,9 +1294,13 @@ function contentOspiti(room){
     var x0 = 0, y0 = 2;
     var disc = new THREE.Group(); disc.position.set(x0, y0, -9.6); room.add(disc);
     var fm = M({ roughness: .5 });
-    add(disc, new THREE.CylinderGeometry(.28, .28, .05, 48), [gold, fm, gold], 0, 0, 0, Math.PI/2, Math.PI/2);
+    var face = add(disc, new THREE.CylinderGeometry(.28, .28, .05, 48), [gold, fm, gold], 0, 0, 0, Math.PI/2, Math.PI/2);
     add(disc, new THREE.TorusGeometry(.285, .025, 8, 48), gold);
-    var dd = { group: disc, mat: fm, y0: y0 }; discs.push(dd);
+    var dd = { group: disc, mat: fm, y0: y0, person: null }; discs.push(dd);
+    var gb = { mesh: face, holder: disc, room: 3, action: function(){ showGuestCard(dd.person); }, set: function(){}, press: function(){},
+      hover: function(on){ disc.scale.multiplyScalar(on ? 1.08 : 1 / 1.08); },
+      visible: function(){ var o = disc; while (o) { if (!o.visible) return false; o = o.parent; } return true; } };
+    face.userData.btn = gb; clickables.push(gb);
     var ph = i * .8;
     anim.push(function(t){ if (!disc.visible) return; disc.position.y = dd.y0 + Math.sin(t * .8 + ph) * .04 * disc.scale.x; disc.rotation.y = Math.sin(t * .5 + ph) * .18; });
   })(i);
@@ -2657,6 +2670,25 @@ function showRulesPanel(mode, cb){
 }
 
 function demoBadge(){ if (document.getElementById('demobadge')) return; var d = document.createElement('div'); d.id = 'demobadge'; d.textContent = 'Anteprima · dati di esempio, non quelli reali'; d.style.cssText = 'position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:70;background:#8e2b1f;color:#fff;font:600 12px/1 system-ui,sans-serif;letter-spacing:.04em;padding:8px 14px;border-radius:999px;box-shadow:0 4px 16px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap'; document.body.appendChild(d); }
+function showGuestCard(p){
+  if (!p) return;
+  var g = document.getElementById('guestcard');
+  var ph = g.querySelector('.gc-photo'); ph.innerHTML = '';
+  if (p.foto) { var im = document.createElement('img'); im.src = p.foto; im.alt = 'Foto di ' + p.nick; ph.appendChild(im); }
+  else { ph.textContent = String(p.nick || '?').charAt(0).toUpperCase(); ph.style.background = p.color || '#1a2a5c'; }
+  g.querySelector('.gc-nick').textContent = p.nick || '';
+  var full = ((p.nome || '') + ' ' + (p.cognome || '')).trim();
+  g.querySelector('.gc-name').textContent = full && full !== p.nick ? full : '';
+  g.querySelector('.gc-tag').hidden = !p.host;
+  g.hidden = false;
+  var btn = document.getElementById('gc-btn');
+  function close(){ g.hidden = true; btn.onclick = null; g.onclick = null; document.removeEventListener('keydown', key); }
+  function key(e){ if (e.key === 'Escape') close(); }
+  btn.onclick = close; g.onclick = function(e){ if (e.target === g) close(); };
+  document.addEventListener('keydown', key);
+  try { btn.focus({ preventScroll: true }); } catch(_) {}
+}
+
 function partyLights(){
   var hallCeil = tex(1024, 1024, function(x, w, h){
     starCeilDraw(x, w, h);
