@@ -850,7 +850,7 @@ var SKEY = 'festaMagica.session.v2';
 var USER_COLS = 'id,ruolo,nome,cognome,nick,foto,pagato,viaggio,avviso,creato';
 var sb = null, DEMO = false, channel = null, PASSWORDS = {};
 var MAX = 45;
-var PARTY = { name: 'WoodHouse', date: '2026-12-12', time: '21:00', place: "Piazza dell'Isolotto, Firenze", maps: 'https://www.google.com/maps/search/?api=1&query=Piazza+dell%27Isolotto+Firenze', fee: 30, iban: 'IT60 X054 2811 1010 0000 0123 456', holder: 'Sun System' };
+var PARTY = { name: 'WoodHouse', date: '2026-12-12', time: '21:00', place: "Piazza dell'Isolotto, Firenze", maps: 'https://www.google.com/maps/search/?api=1&query=Piazza+dell%27Isolotto+Firenze', fee: 30, iban: 'IT60 X054 2811 1010 0000 0123 456', holder: 'Michelangelo Gabrielli' };
 var PEOPLE = [], CARS = [];
 var PALETTE = ['#8e2b1f', '#4a7398', '#c9a066', '#2c4f74', '#6a1e15', '#9a6e37', '#84a5bf', '#5c4632', '#4f5c7a'];
 function colorFor(id){ var h = 0; for (var i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0; return PALETTE[h % PALETTE.length]; }
@@ -1087,18 +1087,19 @@ function drawQuotaFace(x, w, h, s){
   marbleFace(73)(x, w, h); faceFrame(x, w, h);
   var NAVY = '#1a2a5c', RED = '#8e2b1f', INK = '#2a1c14', cx = w / 2;
   faceLabel(x, 'QUOTA A PERSONA', cx, h * .13, s);
-  T(x, PARTY.fee + ' €', cx, h * .31, s * .3, { serif: true, weight: 700, color: NAVY });
+  T(x, PARTY.fee + ' €', cx, h * .29, s * .3, { serif: true, weight: 700, color: NAVY });
   /* scadenza in evidenza */
   var pill = 'DA VERSARE ENTRO IL ' + PAY_SHORT; x.font = '600 ' + (s * .062) + 'px ' + SANS;
   if ('letterSpacing' in x) x.letterSpacing = (s * .016) + 'px';
   var pw = x.measureText(pill).width + s * .2; if ('letterSpacing' in x) x.letterSpacing = '0px';
-  x.strokeStyle = RED; x.lineWidth = 2.5; rr(x, cx - pw / 2, h * .425, pw, h * .1, h * .05); x.stroke();
-  T(x, pill, cx, h * .477, s * .062, { weight: 600, color: RED, spacing: s * .016 });
-  faceRule(x, cx, h * .585, w * .16);
-  faceLabel(x, 'IBAN', cx, h * .655, s);
-  x.fillStyle = 'rgba(160,124,52,.13)'; x.fillRect(w * .1, h * .69, w * .8, h * .11);
-  fitT(x, PARTY.iban, cx, h * .747, s * .088, w * .76, { weight: 600, color: INK, spacing: s * .006 });
-  T(x, 'Causale:  ' + PARTY.name + ' – ' + (USER.nick || 'il tuo nickname'), cx, h * .875, s * .066, { weight: 400, color: '#5c4632' });
+  x.strokeStyle = RED; x.lineWidth = 2.5; rr(x, cx - pw / 2, h * .4, pw, h * .095, h * .047); x.stroke();
+  T(x, pill, cx, h * .449, s * .062, { weight: 600, color: RED, spacing: s * .016 });
+  faceRule(x, cx, h * .545, w * .16);
+  faceLabel(x, 'IBAN', cx, h * .605, s);
+  x.fillStyle = 'rgba(160,124,52,.13)'; x.fillRect(w * .1, h * .64, w * .8, h * .105);
+  fitT(x, PARTY.iban, cx, h * .694, s * .088, w * .76, { weight: 600, color: INK, spacing: s * .006 });
+  fitT(x, 'Intestato a  ' + (PARTY.holder || ''), cx, h * .8, s * .074, w * .8, { weight: 500, color: INK });
+  fitT(x, 'Causale:  ' + PARTY.name + ' – ' + (USER.nick || 'il tuo nickname'), cx, h * .878, s * .062, w * .8, { weight: 400, color: '#5c4632' });
 }
 function drawSeal(x, w, h){
   var paid = me() && me().paid;
