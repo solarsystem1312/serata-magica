@@ -1247,8 +1247,11 @@ function contentPassaggi(room){
   refreshBoard();
 }
 
+var GUESTS_HIDDEN = true;
+function guestsHidden(){ return GUESTS_HIDDEN && !USER.host; }
 function drawOspitiTablet(x, w, h, s){
   marbleFace(101)(x, w, h);
+  if (guestsHidden()) { fitT(x, 'La lista sarà svelata presto', w / 2, h * .5, s * .12, w * .86, { serif: true, weight: 700 }); return; }
   var n = PEOPLE.length;
   T(x, 'Ospiti', w*.1, h*.5, s*.13, { serif: true, weight: 700, align: 'left' });
   x.fillStyle = '#d9cfbd'; x.fillRect(w*.38, h*.44, w*.26, h*.12);
@@ -1282,8 +1285,8 @@ function medalDraw(p){
   };
 }
 function refreshGuests(){
-  if (ospitiSlab && changed('tablet', PEOPLE.length)) { var m = ospitiSlab.material[4]; m.map.dispose(); m.map = faceTex(1.9, .46, drawOspitiTablet); m.needsUpdate = true; }
-  var list = PEOPLE.slice().sort(function(a, b){ return (b.id === USER.id) - (a.id === USER.id) || (b.host - a.host); });
+  if (ospitiSlab && changed('tablet', [PEOPLE.length, guestsHidden()])) { var m = ospitiSlab.material[4]; m.map.dispose(); m.map = faceTex(1.9, .46, drawOspitiTablet); m.needsUpdate = true; }
+  var list = guestsHidden() ? [] : PEOPLE.slice().sort(function(a, b){ return (b.id === USER.id) - (a.id === USER.id) || (b.host - a.host); });
   var PAGE = 24, pages = Math.max(1, Math.ceil(list.length / PAGE)); if (guestPage >= pages) guestPage = 0;
   var m = Math.min(PAGE, list.length - guestPage * PAGE), best = null;
   for (var c = 4; c <= 6; c++) { var rows = Math.max(1, Math.ceil(m / c)), cell = Math.min(2.7 / c, 1.72 / rows, .78); if (!best || cell > best.cell + 1e-6) best = { c: c, rows: rows, cell: cell }; }
